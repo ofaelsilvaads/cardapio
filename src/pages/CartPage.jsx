@@ -37,8 +37,8 @@ const CartPage = ({
       {/* Navbar */}
       <nav className="navbar">
         <div className="navbar-left">
-          <img src={logo} alt="Logo Alex Salgados" className="logo" />
-          <h1>Alex Salgados</h1>
+          
+          <h1>Ale Salgados</h1>
         </div>
         <div className="navbar-right" onClick={() => navigate("/cart")}>
           <FaShoppingCart className="cart-icon" />

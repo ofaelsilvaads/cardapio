@@ -43,7 +43,7 @@ select {
   width: 100%;
   max-width: -webkit-fill-available;
   background-color: #f0a500;
-  padding: 10px 20px;
+  padding: 15px 20px;
   display: flex;
   gap: 80px;
   justify-content: center;
@@ -159,7 +159,7 @@ input[type="number"] {
   padding: 10px;
   border: 1px solid #d4d4d4;
   border-radius: 15px;
- 
+  margin-top: 10px;
 }
 
 .home-content p{

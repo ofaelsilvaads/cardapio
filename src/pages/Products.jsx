@@ -21,7 +21,7 @@ const Products = ({ addToCart, cart }) => {
       {/* Navbar */}
       <nav className="navbar">
         <div className="navbar-left">
-          <h1>Alex Salgados</h1>
+          <h1>Ale Salgados</h1>
         </div>
         <div className="navbar-right" onClick={() => navigate("/cart")}>
           <FaShoppingCart className="cart-icon" />

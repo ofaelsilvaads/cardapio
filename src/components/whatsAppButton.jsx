@@ -32,7 +32,7 @@ const WhatsAppButton = ({
     }\n`;
     message += `\nEndereço: ${address}\n`;
 
-    const phoneNumber = "5511965115742"; // Substitua pelo número do WhatsApp
+    const phoneNumber = "5511932938890"; // Substitua pelo número do WhatsApp
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     // Adicionar o pedido ao histórico
