@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import ProductList from "../components/productList";
 import "../styles.css";
 import logo from "../assets/logo.jpg";
+import { FaShoppingCart } from "react-icons/fa"; // Ícone de carrinho
+import { FaStar } from "react-icons/fa";
 
 const Products = ({ addToCart, cart }) => {
   const navigate = useNavigate();
@@ -15,43 +17,46 @@ const Products = ({ addToCart, cart }) => {
   };
 
   return (
-
-    <div class="container">
-
-        <div class="fundo-logo">
-            <div className="home-content">
-            <img src={logo} alt="Logo Alex Salgados" className="logo" />
-            <h1>Alex Salgados</h1>
-            <h2>Atendimento Delivery:<br></br> Terça a Sábado das 15:30 às 20:00</h2>
+    <div className="container">
+      {/* Navbar */}
+      <nav className="navbar">
+        <div className="navbar-left">
+          <h1>Alex Salgados</h1>
         </div>
-
+        <div className="navbar-right" onClick={() => navigate("/cart")}>
+          <FaShoppingCart className="cart-icon" />
+          <span className="cart-count">{cart.length}</span>
         </div>
+      </nav>
 
-         <div className="products-container">
-        
-        <button onClick={() => navigate("/cart")} className="cart-button">
-          Ver Carrinho ({cart.length})
-        </button>
-  
+      <div className="fundo-logo">
+        <div className="home-content">
+          <img src={logo} alt="Logo Alex Salgados" className="logo" />
+          <p className="avaliação">Avaliação<br></br> <FaStar className="avaliacao"/>
+          <FaStar className="avaliacao"/>
+          <FaStar className="avaliacao"/>
+          <FaStar className="avaliacao"/>
+          <FaStar className="avaliacao"/> (5.0)</p>
+          <h2>Atendimento Delivery:<br></br> Terça a Sábado das 15:30 às 20:00</h2>
+        </div>
+      </div>
+
+      <div className="products-container">
         {/* Mensagem de produto adicionado */}
         {showAddedMessage && (
           <div className="added-message">
             Produto adicionado ao carrinho!
           </div>
         )}
-  
+
         {/* Lista de Produtos */}
         <ProductList addToCart={handleAddToCart} />
       </div>
 
-      <div class="text">
+      <div className="text">
         <a href="incodet.com">Desenvolvido por Incodet</a>
       </div>
-
-    </div>        
-    
-
-   
+    </div>
   );
 };
 

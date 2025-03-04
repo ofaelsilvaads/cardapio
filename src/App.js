@@ -9,6 +9,8 @@ const App = () => {
   const [cart, setCart] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [orderHistory, setOrderHistory] = useState([]);
+  const [deliveryOption, setDeliveryOption] = useState("inside"); // Estado para a opção de entrega
+  const [address, setAddress] = useState(""); // Estado para o endereço
 
   // Carregar o carrinho e o histórico do localStorage ao iniciar
   useEffect(() => {
@@ -83,6 +85,10 @@ const App = () => {
               clearCart={clearCart}
               calculateTotal={calculateTotal}
               addToOrderHistory={addToOrderHistory}
+              deliveryOption={deliveryOption} // Passando o estado
+              setDeliveryOption={setDeliveryOption} // Passando a função
+              address={address} // Passando o estado
+              setAddress={setAddress} // Passando a função
             />
           }
         />

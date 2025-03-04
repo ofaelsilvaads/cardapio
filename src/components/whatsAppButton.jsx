@@ -1,6 +1,13 @@
 import React from "react";
 
-const WhatsAppButton = ({ cart, paymentMethod, addToOrderHistory, clearCart }) => {
+const WhatsAppButton = ({
+  cart,
+  paymentMethod,
+  addToOrderHistory,
+  clearCart,
+  deliveryOption,
+  address,
+}) => {
   const sendOrder = () => {
     if (cart.length === 0) {
       alert("Seu carrinho está vazio!");
@@ -19,17 +26,21 @@ const WhatsAppButton = ({ cart, paymentMethod, addToOrderHistory, clearCart }) =
       ).toFixed(2)}\n`;
     });
 
-    message += `\nForma de Pagamento: ${paymentMethod}`;
+    message += `\nForma de Pagamento: ${paymentMethod}\n`;
+    message += `\nLocal de Entrega: ${
+      deliveryOption === "inside" ? "Condomínio Parque dos Sonhos" : "Motoboy da Uber"
+    }\n`;
+    message += `\nEndereço: ${address}\n`;
 
-    const phoneNumber = "5511999999999"; // Substitua pelo número do WhatsApp
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
+    const phoneNumber = "5511965115742"; // Substitua pelo número do WhatsApp
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     // Adicionar o pedido ao histórico
     addToOrderHistory({
       items: cart,
       paymentMethod,
+      deliveryOption,
+      address,
       total: cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2),
     });
 
