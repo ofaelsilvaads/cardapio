@@ -57,7 +57,7 @@ const ProductList = ({ addToCart }) => {
 
   useEffect(() => {
     // URL da API gerada pelo sheet.best
-    const sheetUrl = "https://api.sheetbest.com/sheets/56f39dfa-dd07-47f3-abf8-e2f30156e289";
+    const sheetUrl = "https://sheetdb.io/api/v1/l2q58cg2rt0g4";
 
     // Busca os dados da planilha
     fetch(sheetUrl)
