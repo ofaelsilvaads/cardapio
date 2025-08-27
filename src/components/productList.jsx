@@ -1,102 +1,127 @@
 import React, { useState, useEffect } from "react";
-import BolinhoDeQueijo from "../assets/bolinho de queijo.jpg"; // Importe a imagem
-import carne from "../assets/carne.jpg";
-import carneseca from "../assets/carneseca.jpg";
-import coxinha from "../assets/coxinha.jpg";
-import presuntequeijo from "../assets/presuntoequeijo.jpg";
-import coxinhacatupiry from "../assets/coxinhacatupiry.jpg";
-
-// Lista de produtos com as imagens locais
-const localProducts = [
-  {
-    id: 1,
-    name: "Coxinha de Frango",
-    description: "110g Consultar disponibilidade",
-    price: 7,
-    image: coxinha,
-  },
-  {
-    id: 2,
-    name: "Coxinha de Frango c/ Catupiry",
-    description: "120g",
-    price: 8,
-    image: coxinhacatupiry,
-  },
-  {
-    id: 3,
-    name: "Coxinha de Carne Seca c/ Catupiry",
-    description: "120g",
-    price: 10,
-    image: carneseca,
-  },
-  {
-    id: 4,
-    name: "Bolinha de Queijo",
-    description: "110g",
-    price: 7,
-    image: BolinhoDeQueijo,
-  },
-  {
-    id: 5,
-    name: "Salgado Presunto e Queijo",
-    description: "110g",
-    price: 7,
-    image: presuntequeijo,
-  },
-  {
-    id: 6,
-    name: "Bolinho de Carne",
-    description: "110g",
-    price: 7,
-    image: carne,
-  },
-];
 
 const ProductList = ({ addToCart }) => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // URL da API gerada pelo sheet.best
-    const sheetUrl = "https://sheetdb.io/api/v1/l2q58cg2rt0g4";
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("https://sheetdb.io/api/v1/l2q58cg2rt0g4");
+        const data = await response.json();
+        
+        // Debug: verifique os dados no console
+        console.log("Dados da planilha:", data);
 
-    // Busca os dados da planilha
-    fetch(sheetUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        // Filtra apenas os produtos disponíveis
-        const availableProducts = data.filter((product) => product.Disponível === "Sim");
+        // Verifica as colunas reais (pode ser case sensitive)
+        const sampleProduct = data[0];
+        const disponivelKey = Object.keys(sampleProduct).find(key => 
+          key.toLowerCase().includes('dispon') || key.toLowerCase().includes('available')
+        );
+        
+        const nomeKey = Object.keys(sampleProduct).find(key => 
+          key.toLowerCase().includes('nome') || key.toLowerCase().includes('name')
+        );
+        
+        const precoKey = Object.keys(sampleProduct).find(key => 
+          key.toLowerCase().includes('preço') || key.toLowerCase().includes('price') || key.toLowerCase().includes('preco')
+        );
+        
+        const imagemKey = Object.keys(sampleProduct).find(key => 
+          key.toLowerCase().includes('imagem') || key.toLowerCase().includes('image')
+        );
+        
+        const idKey = Object.keys(sampleProduct).find(key => 
+          key.toLowerCase().includes('id')
+        );
 
-        // Combina os dados da planilha com as imagens locais
-        const updatedProducts = localProducts.map((localProduct) => {
-          const productAvailability = availableProducts.find(
-            (product) => product.ID === localProduct.id.toString()
-          );
+        console.log("Chaves encontradas:", { disponivelKey, nomeKey, precoKey, imagemKey, idKey });
+
+        // Filtra produtos disponíveis
+        const availableProducts = data.filter((product) => {
+          const disponivelValue = product[disponivelKey] ? product[disponivelKey].toString().toLowerCase().trim() : '';
+          const isAvailable = disponivelValue === "sim" || 
+                             disponivelValue === "yes" ||
+                             disponivelValue === "true";
+          
+          return isAvailable && product[nomeKey] && product[precoKey];
+        });
+
+        console.log("Produtos disponíveis:", availableProducts);
+
+        // Formata os produtos
+        const formattedProducts = availableProducts.map((product) => {
+          // Limpa e converte o preço
+          let priceValue = 0;
+          try {
+            const priceString = product[precoKey].toString();
+            priceValue = parseFloat(
+              priceString
+                .replace('R$', '')
+                .replace(',', '.')
+                .replace(/[^\d.]/g, '')
+                .trim()
+            );
+          } catch (error) {
+            console.error("Erro ao converter preço:", product[precoKey]);
+          }
+
           return {
-            ...localProduct,
-            available: productAvailability ? true : false,
+            id: product[idKey] || Math.random(),
+            name: product[nomeKey],
+            description: product.Descrição || product.descricao || "",
+            price: priceValue || 0, // Garante que sempre tenha um valor
+            image: product[imagemKey],
+            available: true
           };
         });
 
-        // Filtra os produtos que estão disponíveis
-        const filteredProducts = updatedProducts.filter((product) => product.available);
-        setProducts(filteredProducts);
-      })
-      .catch((error) => {
+        setProducts(formattedProducts);
+        setLoading(false);
+
+      } catch (error) {
         console.error("Erro ao buscar os produtos:", error);
-      });
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
+
+  if (loading) {
+    return <div className="loading">Carregando produtos...</div>;
+  }
 
   return (
     <div className="products-list">
-      {products.map((product) => (
-        <div key={product.id} className="product-card">
-          <img src={product.image} alt={product.name} className="product-image" />
-          <h2>{product.name}</h2>
-          <p>{product.description}</p>
-          <p>R$ {product.price.toFixed(2)}</p>
-          <button onClick={() => addToCart(product)}>Adicionar ao Carrinho</button>
+      {products.length === 0 ? (
+        <div className="no-products">
+          <p>Nenhum produto disponível no momento.</p>
+          <p>Verifique o console para detalhes (F12 → Console)</p>
         </div>
-      ))}
+      ) : (
+        products.map((product) => (
+          <div key={product.id} className="product-card">
+            <div className="product-image-container">
+              <img 
+                src={product.image} 
+                alt={product.name} 
+                className="product-image"
+                onError={(e) => {
+                  // Fallback seguro usando data URI (SVG inline)
+                  e.target.onerror = null; // Previne loop infinito
+                  e.target.src = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iMC4zNWVtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZpbGw9IiM2NjYiPjx0c3BhbiBkeT0iLTAuNWVtIj5JbWFnZW08L3RzcGFuPjx0c3BhbiBkeT0iMC43ZW0iPm7Dg28gZGlzcG9uw612ZWw8L3RzcGFuPjwvdGV4dD48L3N2Zz4=`;
+                  e.target.style.opacity = "0.8";
+                }}
+              />
+            </div>
+            <h2>{product.name}</h2>
+            <p>{product.description}</p>
+            <p>R$ {product.price.toFixed(2)}</p>
+            <button onClick={() => addToCart(product)}>Adicionar ao Carrinho</button>
+          </div>
+        ))
+      )}
     </div>
   );
 };
